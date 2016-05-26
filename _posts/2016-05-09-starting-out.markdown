@@ -20,8 +20,11 @@ In Wait But Why, Tim Urban describes his process [like this](http://waitbutwhy.c
 I love reading his posts because he does two things.  First, he figures out what he doesn't get, even if it's something
 that seems like everyone is supposed to know about.  Second, he digs and digs until he's gotten
 to the basic principles at the "floor".  In reading his posts, I get to benefit
-from all his hard work. Not only that, but his "tree trunk" method of explaining things
-helps me to keep the knowledge in my head rather than immediately forgetting about it.
+from all his hard work. Not only that, but his explanations give me a basis to
+more easily confront and contextualize new information about a topic.  (He refers
+  to it as his "tree trunk" where he can hang new information later on in the
+  post linked above.)  This leads me to feel that reading his post was time
+  well spent.
 
 Christopher Olah has a similar approach.  In the introduction to his post on [information theory](http://colah.github.io/posts/2015-09-Visual-Information/), he says:
 
@@ -46,12 +49,12 @@ question and answers them scientifically.  What I really like about these posts 
 
 What I like about all of these blogs is that they provide value to their readers
 by being persistent with breaking down complicated topics into digestible chunks.
-They get to the bottom of a topic, take a step back, and bring it back together.  
+They get to the bottom of a topic, take a step back, and bring it back together.
 They also take very little as a "given". Instead they make themselves some building
 blocks and the build themselves an understanding.
 
 I want to take a similar approach to my blog.  I want break topics down to their
  first principles and build them up to an enriching understanding.
-I want to take no concept as granted. I want a reader to come away knowing that
+I want to take no concept for granted. I want a reader to come away knowing that
 the topic has been thoroughly run down and feel confident about adding to their
 understanding.
