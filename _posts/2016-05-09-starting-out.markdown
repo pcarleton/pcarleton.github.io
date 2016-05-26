@@ -24,12 +24,15 @@ from all his hard work. Not only that, but his "tree trunk" method of explaining
 helps me to keep the knowledge in my head rather than immediately forgetting about it.
 
 Christopher Olah has a similar approach.  In the introduction to his post on [information theory](http://colah.github.io/posts/2015-09-Visual-Information/), he says:
+
 > Unfortunately, information theory can seem kind of intimidating. I don’t think there’s any reason it should be. In fact, many core ideas can be explained completely visually!
 
-He proceeds to break down this seemingly daunting concept area in a way that can only
-be done by someone who gets the concepts at a fundamental level. By the end of one of his posts, I feel
-like I have a good foundation in the topic, and I have images in my head to refer back to.
-Another thing that's great about his posts is that I know I can refer back to them.  For instance,
+He proceeds to break down this seemingly daunting area in a way that can only
+be done by someone who gets the concepts at a fundamental level. By the end of the post,
+ I am comfortable enough with the foundation of the topic that I could hold
+ my own in a conversation about it.  I feel ready to add more to my foundation
+ because it's been explained in such an accessible way.  Another thing that's
+ great about his posts is that I know I can refer back to them.  For instance,
 the concept of "mutual information" came up at work, and I knew immediately where I should
 go for a refresher.
 
@@ -37,16 +40,18 @@ In ["What If?"](https://what-if.xkcd.com), Randall Munroe takes absurd hypotheti
 question and answers them scientifically.  What I really like about these posts is
  that they illustrate that even the most ridiculous of questions can be broken down
  into pieces that fit into reality.  He always finds some footing to gain traction
- into the problem and explain it in terms of something more familiar.
+ into the problem and explain it in terms of something more familiar.  When most
+ people would say, "That's ridiculous, we'll never know", he keeps coming at the
+ problem again and again until it starts to make sense.
 
 What I like about all of these blogs is that they provide value to their readers
-by distilling complicated topics into digestible chunks.  They get to the bottom
-of a topic and then back up and bring it back together.  Their posts have little
-to no pre-requisite knowledge.  Nothing is really a "given", and instead they
-reason their way from the basic building blocks they find to their end result.
+by being persistent with breaking down complicated topics into digestible chunks.
+They get to the bottom of a topic, take a step back, and bring it back together.  
+They also take very little as a "given". Instead they make themselves some building
+blocks and the build themselves an understanding.
 
-I want to take a similar approach to my blog.  I want to select a topic and
-break it down to its first principles and build it back up to a full understanding.
-I want to take no concept as granted. I want a reader to come away with a
-few nuggets of information and the vocabulary that enables them to find out more
-if they are interested.
+I want to take a similar approach to my blog.  I want break topics down to their
+ first principles and build them up to an enriching understanding.
+I want to take no concept as granted. I want a reader to come away knowing that
+the topic has been thoroughly run down and feel confident about adding to their
+understanding.
