@@ -3,73 +3,50 @@ layout: post
 title:  "Starting Out"
 date:   2016-05-09 08:21:54 -0700
 ---
-
-I read a lot of things on the internet.  I write a lot of stream of consciousness
-in daily logs.  I work on side projects.  I want to write in order to organize
-my thoughts, share checkpoints in my works in progress, and give back for all
-the blog posts I have read that have helped me.
-
-Blogs I like:
+In order to decide what kind of blog I wanted to make, I turned to some of my favorite blogs:
 
 1. [Wait But Why](http://waitbutwhy.com/)
 1. [colah.github.io](http://colah.github.io)
-1. [Coding Horror](http://blog.codinghorror.com/)
-1. [Joel On Software](http://joelonsoftware.com)
+1. [What If?](https://what-if.xkcd.com/)
 
+They all share a common theme.
+The author has learned something and creates a post to share
+that knowledge.
 
+In Wait But Why, Tim Urban describes his process [like this](http://waitbutwhy.com/2015/06/how-tesla-will-change-your-life.html):
 
-Things I like about them:
+> The way I approach a post like that is I’ll start with the surface of the topic and ask myself what I don’t fully get—I look for those foggy spots in the story where when someone mentions it or it comes up in an article I’m reading, my mind kind of glazes over with a combination of “ugh it’s that icky term again nah go away” and “ew the adults are saying that adult thing again and I’m seven so I don’t actually understand what they’re talking about.” Then I’ll get reading about those foggy spots—but as I clear away fog from the surface, I often find more fog underneath. So then I research that new fog, and again, often come across other fog even further down. My perfectionism kicks in and I end up refusing to stop going down the rabbit hole until I hit the floor.
 
-* Specific/Focused
-  * They go deep on a particular topic until they bottom out or reach a resolution.
-* Practical
-  * Including code snippets and diagrams
-* Thorough
-  * Reading those posts gives you confidence in the subject matter because the author demonstrates
-    that they have done their research in the area.  You feel that you are getting a distilled
-    version of the information.  It feels as if you are saving yourself time by reading their version
-    than trying to figure out your own.
-* Consistent
- * I know what to expect when I find a new post on one of those blogs.
+I love reading his posts because he does two things.  First, he figures out what he doesn't get, even if it's something
+that seems like everyone is supposed to know about.  Second, he digs and digs until he's gotten
+to the basic principles at the "floor".  In reading his posts, I get to benefit
+from all his hard work. Not only that, but his "tree trunk" method of explaining things
+helps me to keep the knowledge in my head rather than immediately forgetting about it.
 
-What do I want to get out of writing a blog?
+Christopher Olah has a similar approach.  In the introduction to his post on [information theory](http://colah.github.io/posts/2015-09-Visual-Information/), he says:
+> Unfortunately, information theory can seem kind of intimidating. I don’t think there’s any reason it should be. In fact, many core ideas can be explained completely visually!
 
-* Practice communicating
-* Crystallize thoughts
-* Reference for myself to refer back to
+He proceeds to break down this seemingly daunting concept area in a way that can only
+be done by someone who gets the concepts at a fundamental level. By the end of one of his posts, I feel
+like I have a good foundation in the topic, and I have images in my head to refer back to.
+Another thing that's great about his posts is that I know I can refer back to them.  For instance,
+the concept of "mutual information" came up at work, and I knew immediately where I should
+go for a refresher.
 
-What do I want to avoid?
+In ["What If?"](https://what-if.xkcd.com), Randall Munroe takes absurd hypothetical
+question and answers them scientifically.  What I really like about these posts is
+ that they illustrate that even the most ridiculous of questions can be broken down
+ into pieces that fit into reality.  He always finds some footing to gain traction
+ into the problem and explain it in terms of something more familiar.
 
-Whenever I decide I want to tweet more, I start seeing the world through a lens
-of snarky tweet sized tidbits.  I don't want to start seeing the world through a
-lens of "This could make a great blog post!".  However, if blogging is going to
-be a new hobby, and something I want to improve on, then thinking about it a lot
-will be worthwhile.
+What I like about all of these blogs is that they provide value to their readers
+by distilling complicated topics into digestible chunks.  They get to the bottom
+of a topic and then back up and bring it back together.  Their posts have little
+to no pre-requisite knowledge.  Nothing is really a "given", and instead they
+reason their way from the basic building blocks they find to their end result.
 
-How can I get to a place where I am publishing blog posts I am proud of?
-
-* Lots of Practice
-* Conquer fear of failure or embarrassment
-* External feedback
-
-There will be a balance between the need to practice with the need to maintain
-the quality of the posts.  Does publishing partially completed posts mean that
-I've conquered my fear of embarrassment? Or does it mean that I've compromised
-on quality?  If I strive for perfection, will I ever post anything?
-
-I could use some rules or guiding principles.  These can evolve as I learn
-more about how to publish, but they should remain challenging.  The rules will
-be a measuring stick for determining if I am staying true to my goals.  For starters,
-I'll go with this:
-
-1. One discrete improvement per week
-  * Post, Revision, Infrastructure/Technology
-1. One practical step a reader can take
-1. One example of research in to the topic.
-1. One diagram or code snippet
-
-
-This week was getting the infrastructure set up, and making this post.  The practical
-step for this week could be to checkout the posts I listed.  I still need to
-do some research on how to blog and I should also include the snippet to get a
-blog set up.
+I want to take a similar approach to my blog.  I want to select a topic and
+break it down to its first principles and build it back up to a full understanding.
+I want to take no concept as granted. I want a reader to come away with a
+few nuggets of information and the vocabulary that enables them to find out more
+if they are interested.
