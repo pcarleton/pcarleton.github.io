@@ -1,7 +1,6 @@
 ---
 layout: post
-title:  ""Installing Linux on a MacBook Air"
-date:   2016-05-09 08:21:54 -0700
+title:  "Installing Linux on a MacBook Air"
 ---
 
 See my last post about the saga involved in getting my laptop up and running again.
