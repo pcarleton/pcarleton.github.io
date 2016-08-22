@@ -5,8 +5,7 @@ title:  "Fixing a MacBook Air After a Spill"
 
 # TL;DR
 
-I spilled on my laptop, and decided to fix it. I found the [replacement part][pbm-part] (and later a [cheaper option][pbm-keyboard]),  [tools][toolkit],
-and [step-by-step guide][guide]. The replacement was a success, cost $280 and took about 2 hours.
+I spilled on my laptop, and decided to fix it. I found a [step-by-step guide][guide], the [tools required][toolkit], and the [replacement part][pbm-part] (and later a [cheaper option][pbm-keyboard]). The replacement was a success, cost $280 and took about 2 hours.
 
 # Background
 
