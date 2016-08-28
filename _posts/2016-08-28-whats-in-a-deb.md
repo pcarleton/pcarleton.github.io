@@ -3,7 +3,7 @@ layout: post
 title:  "What's In A .deb"
 ---
 
-I recently installed Debian on my MacBookAir (see my [last post][lastpost] for details).  As a part of that exercise, I touched some `.deb` files which got me wondering, what's in a `.deb` file?  
+I recently installed Debian on my MacBookAir (see my [last post][mba-linux-post] for details).  As a part of that exercise, I touched some `.deb` files which got me wondering, what's in a `.deb` file?  
 
 # The `.deb` File Format
 [Wikipedia](https://en.wikipedia.org/wiki/Deb_(file_format)) tells us:
@@ -112,4 +112,4 @@ usr
 
 This structure mimics where the files ended up on my machine after installing.  In a follow up post, I'll take a look at how to create our own `.deb` file and also the different compression modes for `tar`.
 
-[lastpost]:NONE
+[mba-linux-post]:{% post_url 2016-08-25-mba-linux %}

@@ -52,7 +52,7 @@ Make sure to flip  up the retaining flaps on your ZIF sockets before taking the 
 
 All in all the repair went well, and I will definitely be repairing the next piece of electronics I break.  I highly recommend giving it a shot next time you have a mishap like mine.
 
-Checkout my next post where I explain how I installed Linux on my newly repaired laptop.
+Checkout my [next post][mba-linux-post] where I explain how I installed Linux on my newly repaired laptop.
 
 [guide]: https://www.ifixit.com/Guide/MacBook+Air+13-Inch+Mid+2011+Upper+Case+Replacement/9427
 [toolkit]: https://www.ifixit.com/Store/Tools/Pro-Tech-Toolkit/IF145-307-1
@@ -62,3 +62,4 @@ Checkout my next post where I explain how I installed Linux on my newly repaired
 [kvm-switch]: https://www.amazon.com/gp/product/B00006B8EC/ref=oh_aui_search_detailpage?ie=UTF8&psc=1
 [serial-no]: http://www.powerbookmedic.com/identify-mac-serial.php
 [ebay]:http://www.ebay.com/sch/i.html?_from=R40&_trksid=p2050601.m570.l1313.TR12.TRC2.A0.H0.Xbroken+macbook+air.TRS0&_nkw=broken+macbook+air&_sacat=0
+[mba-linux-post]:{% post_url 2016-08-25-mba-linux %}
