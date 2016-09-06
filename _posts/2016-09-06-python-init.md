@@ -42,7 +42,7 @@ This is what mssaxm over at axialcorps.com recommends in a post titled [5 Simple
 import a
 import b
 ```
-Then when we run `import foo.b`, it is guaranteed that `a.py` would be executed. (This dependency example is a bit contrived; I do not mean to suggest that sub-modules should make a habit of writing out files on import.)
+Then when we run `import foo.b`, it is guaranteed that `a.py` would be executed before `b.py`. (This dependency example is a bit contrived; I do not mean to suggest that sub-modules should make a habit of writing out files on import.)
 
 Since this approach does not allow non-import code in the `__init__.py`, it seems to suffer from the namespace issue described in #1 above.  However, this can be circumvented by importing member from individual packages.  For instance, if we had a `my_func` that we wanted to be able to access as `import foo; foo.my_func()`, we could put `my_func` in `a.py` and then have our `__init__.py` be `from a import my_func`.
 
