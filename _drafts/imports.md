@@ -1,151 +1,87 @@
 ---
 layout: post
-title:  "What's in __init__.py?"
+title:  "What is __init__.py? and what should I put in it?"
 date:   2016-05-09 08:21:54 -0700
 ---
 
-First - what is __init__.py? What does it do? In what contexts do you need it?
-When is it executed? (Whenever you import a module, whenever you import a sub package)
+# What is \_\_init\_\_.py?
 
-How can it be used?
-global initialization
-an entire package
-to expose the package to users
-empty
+A google search leads us to [stackoverflow][1] and then the [python documentation][2].  The gist is that `__init__.py` is used to indicate that a directory is a python package. (A quick note about packages vs. modules from the [python docs][3]: "From a file system perspective, packages are directories and modules are files.").  Okay, so if we want a folder to be considered a python package, we need to include a `__init__.py` file.  But what should we put init?
 
-what is __all__?
-what gets imported when you say "from X import \*"
+# What to put in it
 
-How do people use it in practice?
+(insert pic?)
 
-one example of a python package
+There is a range of options of what to put in an `__init__.py` file.  On the minimalist side of the spectrum, an `__init__.py` is allowed to be totally empty.  Moving slightly away from this, while still keeping things simple, you can use an `__init__.py` only for determining the import order.  Another step up on the spectrum, you can use the `__init__.py` file to define the API of the package by defining the functions this package exposes.  And the final step is you can actually just define your entire package in the `__init__.py`.
 
-urllib:
-https://github.com/python/cpython/tree/master/Lib/urllib
-empty __init__.py
+Which of those options is right for a particular project depends. I'll dig into the pro's an cons of each of these 4 approaches and give examples of them in the wild in the rest of the post.
 
-json:
-https://github.com/python/cpython/blob/master/Lib/json/__init__.py
-dump, dumps, load, loads
-default encoder global object
-relative imports of encoder and decoder
+# #1 Leave it Empty
 
-collections:
-weird leading underscore imports...
-https://github.com/python/cpython/blob/master/Lib/collections/__init__.py
+This approach is the simplest to communicate and the simplest to enforce.  There is no gray area about not including anything in an `__init__.py`.  The file will serve it's purpose of indicating the folder should be considered a python package, and nothing else.
 
-one example of an open source package
-(requests, urllib3, pandas)
+One disadvantage of this approach is that it fails to take advantage of the special status of the `__init__.py` file.  The code in the file will be executed in the course of importing any of the packages submodules.  For instance, if we have a project with the following directory structure:
+```
+└── foo
+    ├── __init__.py
+    ├── a.py
+    ├── b.py
+    └── bar
+        └── __init__.py
+```
 
-requests:
-https://github.com/kennethreitz/requests/blob/master/requests/__init__.py
-sets up logger
-imports many relative packages.
+And we want to import the "a" module, the statement `from foo import a` looks in the `foo` directory, sees the `__init__.py`.  It knows to treat `foo` as a package, and it executes it's `__init__.py`, then looks for how to import `a`.  (You can verify this behavior by recreating this directory structure and putting print statements in the files.  If you do `from foo import c`, you'll get an `ImportError`, but not after the print statement in `foo/__init__.py` executes.  If you are interested in digging into the python source code, the code for `importlib` is available on [github][5].  Also the spec for the generic Importer Protocol is in [PEP-302][6]).  By leaving our `__init__.py` file blank, we miss out on the opportunity to leverage this.
 
-urllib3:
-https://github.com/shazow/urllib3/blob/master/urllib3/__init__.py
-imports, logger, author, license, warnings
+Another disadvantage is related to namespaces.  In the directory structure listed above, importing `foo` anywhere will be useless. In order to access any of our actual code, we have to import sub modules.  In addition to making import statements longer, naming things is hard.  It is unfortunate to come up with a great name for a package or a sub-package and then also need to come up with good names for sub-modules since that is what you will end up referring to.
 
-https://github.com/shazow/urllib3/blob/master/urllib3/util/__init__.py
-relative imports __all__
-
-pandas:
-https://github.com/pydata/pandas/blob/master/pandas/__init__.py
-
-reads like an import script, defining orders of imports.
-
-What's right for my project?
-Be Consistent
-Small project - cram everything in __init__.py
+An example in the python source of this approach being used is in [urllib][7].
 
 
-Talk about setup.py? pip tools and easy install?  Probably should avoid getting into that.
-Django monolith?  No stay focused.
+# #2 Enforce Import Order
+This is what mssaxm over at axialcorps.com recommends in a post titled [5 Simple Rules For Building Great Python Packages][4].  This approach takes advantage of the special behavior of `__init__.py` while still keeping the file simple.  This approach really shines if your sub-modules have some static initialization.  For example, let's say `a.py` writes a config file when it is imported, and `b.py` reads from that file.  We could have our `__init__.py` ensure that `a.py` is always run before `b.py` by having it's contents be:
+```
+import a
+import b
+```
+Then when we run `import foo.b`, it is guaranteed that `a.py` would be executed. (This dependency example is a bit contrived; I do not mean to suggest that sub-modules should make a habit of writing out files on import.)
+
+Since this approach does not allow non-import code in the `__init__.py`, it seems to suffer from the namespace issue described in #1 above.  However, this can be circumvented by importing member from individual packages.  For instance, if we had a `my_func` that we wanted to be able to access as `import foo; foo.my_func()`, we could put `my_func` in `a.py` and then have our `__init__.py` be `from a import my_func`.
+
+An example of this approach being used is the [fsq][8] package described by in [the post][4] I mentioned above.
 
 
+# #3 Define API
 
-Python imports
-__init__.py
+In this approach, the `__init__.py` file houses the most visible functionality for the package.  It pieces together the functionality from the sub-modules.  This approach has the advantage of providing a good starting point to look into a package, and makes it clear what the top level functionality is.
 
-https://axialcorps.com/2013/08/29/5-simple-rules-for-building-great-python-packages/
+The disadvantage is that your `__init__.py` file is more complicated.  The more complicated it gets, and the more deeply nested your package structure gets, the greater the risk of this causing problems.  Remember that importing a deeply nested package executes the `__init__.py` of every parent package.
 
-http://choosealicense.com/
+Another disadvantage of this approach is that it can be difficult to decide what deserves to be in the `__init__.py` vs. in a sub-module.  As the file gets bigger and more complex, a call will need to be made about when to pull things out.
 
-http://docs.python-guide.org/en/latest/writing/structure/
-ravioli code
-
-Any directory with an __init__.py file is considered a Python package. The different modules in the package are imported in a similar manner as plain modules, but with a special behavior for the __init__.py file, which is used to gather all package-wide definitions
-
-When the project complexity grows, there may be sub-packages and sub-sub-packages in a deep directory structure. In this case, importing a single item from a sub-sub-package will require executing all __init__.py files met while traversing the tree.
-
-http://docs.python-guide.org/en/latest/writing/structure/#context-managers
-Cool, now I understand the "with" keyword a little better.
-Interestingly, they recommend a generator with try/finally.  I wonder if that leads
-to the garbage scenario
+An example of this approach in python library code is in the [json][9] module.  The `__init__.py` file exposes the `dump`, `dumps` and `loads` functions which rely on functionality defined in sub-modules.
 
 
-https://www.python.org/dev/peps/pep-3101/
-Discouragment of % operator
+# #4 The Whole Package
+
+The final approach is to put the entire package in the `__init__.py` file.  This can work well for small packages. It avoids needing to come up with a bunch of new names.
+
+As the package gets larger however, a single file package can become unwieldy.
+
+An example of this approach is [collections][10] module.  (Although, technically it does have one sub-module.)
 
 
-https://docs.python.org/3/library/functions.html#__import__
-python 3 import semantics.  Same as 2.7? Yes.
+# Conclusion
 
-https://docs.python.org/2.7/reference/simple_stmts.html#import
-quote: A package can contain other packages and modules while modules cannot contain other modules or packages. From a file system perspective, packages are directories and modules are files.
+So what should you put in your `__init__.py`?  It depends on the project.  Hopefully the information in this post can help you assess the pro's and con's of each of these approaches.  For a guide on other general things to think about, I found a guide called [Structuring Your Project][11] on python-guide.org to be very helpful.
 
-https://docs.python.org/3/library/importlib.html#importlib.abc.Loader.exec_module
-Seems like exec_module probably gets called for parent packages.
-
-
-https://www.python.org/dev/peps/pep-0302/
-quote: Deeper down in the mechanism, a dotted name import is split up by its components. For "import spam.ham", first an "import spam" is done, and only when that succeeds is "ham" imported as a submodule of "spam". >> The Importer Protocol operates at this level of individual imports. By the time an importer gets a request for "spam.ham", module "spam" has already been imported.
-
-
-The __package__ attribute [8] must be set.
-
-If the module is a Python module (as opposed to a built-in module or a dynamically loaded extension), it should execute the module's code in the module's global name space ( module.__dict__ ).
-
-Here is a minimal pattern for a load_module() method:
-
-# Consider using importlib.util.module_for_loader() to handle
-# most of these details for you.
-def load_module(self, fullname):
-    code = self.get_code(fullname)
-    ispkg = self.is_package(fullname)
-    mod = sys.modules.setdefault(fullname, imp.new_module(fullname))
-    mod.__file__ = "<%s>" % self.__class__.__name__
-    mod.__loader__ = self
-    if ispkg:
-        mod.__path__ = []
-        mod.__package__ = fullname
-    else:
-        mod.__package__ = fullname.rpartition('.')[0]
-    exec(code, mod.__dict__)
-    return mod
-
-https://github.com/python/cpython/blob/master/Lib/importlib/_bootstrap.py#L926
-These lines show the sanity check to ensure that parent is imported first.
-
-https://github.com/python/cpython/blob/master/Lib/importlib/_bootstrap.py#L952
-Shows loading parent first.
-
-There's also a piece about infinite recursion.  If you import a child module in its `__init__.py`, wouldn't it enter an infinite loop?  I believe the solution was to add the package to the "modules" section before executing anything, that way if during the execution, the package was imported again, it would continue as normal.  However, this has the odd property that if you relied on something being done in `__init__.py`, and you also import that module, I don't think you can rely on it being done before you import it...  I'll want to test this out.
-
-Yes, so the `__init__.py` can define the order of imports and this will be respected.  So if you have external effects or other dependencies, if you lay them out in order in your `__init__.py`,
-they will always be respected.
-
-When does it decide if it is a package?
-Where to do the loaders come from? Sys.meta_path?
-
-In my environment, meta_path, and path_hooks both can't handle finding 'al.marbury'.  There must be something else that looks at the "path" variable.
-
-
-
-http://python-notes.curiousefficiency.org/en/latest/python_concepts/break_else.html
-
-
-Could write a simpler python implementation in order to understand its internals
-better.  Could write it in rust instead of C.  Could also just use C.
-
-I also kind of want to make this space thing I've been talking about.
+[1]:http://stackoverflow.com/questions/448271/what-is-init-py-for
+[2]:https://docs.python.org/3/tutorial/modules.html#packages
+[3]:https://docs.python.org/2.7/reference/simple_stmts.html#import
+[4]:https://axialcorps.com/2013/08/29/5-simple-rules-for-building-great-python-packages/
+[5]:https://github.com/python/cpython/blob/master/Lib/importlib/_bootstrap.py#L926
+[6]:https://www.python.org/dev/peps/pep-0302/
+[7]:https://github.com/python/cpython/tree/master/Lib/urllib
+[8]:https://github.com/axialmarket/fsq/blob/master/fsq/__init__.py
+[9]:https://github.com/python/cpython/blob/master/Lib/json/__init__.py
+[10]:https://github.com/python/cpython/blob/master/Lib/collections/__init__.py
+[11]:http://docs.python-guide.org/en/latest/writing/structure/
