@@ -5,11 +5,11 @@ title: "Switching to Ubuntu from Debian"
 
 # From Debian to Ubuntu
 
-I recently decided to switch from Debian to Ubuntu on my Macbook air (see [my previous post][1] about initially installing Debian).  The two situations that prompted this were 1) trying to work with ROS and finding that installing with Ubuntu would be easier and 2) working with OCaml and running into an issue with system packages.  Neither of these is a very compelling reason since I am sure there were ways to get both to work in Debian.  Some times you want to dig deep into why something is not working, and some times you want to just switch to something where it does work.
+I recently decided to switch from Debian to Ubuntu on my Macbook air (see [my previous post][1] about installing Debian).  There were two situations that prompted this: 1) I was trying to work with ROS and finding that installing with Ubuntu would be easier and 2) working with OCaml and running into an issue with system packages.  Neither of these is a very compelling reason since I am sure there were ways to get both to work in Debian.  Some times you want to dig deep into why something is not working, and some times you want to just switch to something where it does work.
 
 # Bootable USB stick w/ other partition
 
-I first downloaded an install image from the [Ubuntu page][2].  I only had one USB stick, and I had some files on it that I wanted to keep.  I wasn't sure if this was possible since most instructions tell you to reformat the USB stick.  Fortunately [an answer][3] on AskUbuntu that suggested it was possible.  It recommended using [gparted][4] (Gnome PARTition EDitor), so I installed that with `sudo apt-get install gparted`.  I was able to shrink the partition that had the files I wanted to keep, and create a new partition to put the Ubuntu live image.  `gparted` also lets you set the "boot" flag on a partition (I'm not actually sure if this step was necessary based on what happened later).  When I was attempting to set the boot flag, the "Manage Flags" button was grayed out.  Thanks to a helpful [superuser][5] post, I learned that you have to apply your partition edits before you can mess with flags.
+I first downloaded an install image from the [Ubuntu page][2].  I only had one USB stick, and I had some files on it that I wanted to keep.  A lot of bootlable USB instructions tell you to format the whole stick, so I was afraid I would need to do some shuffling.  Fortunately [an answer][3] on AskUbuntu showed it was possible using [gparted][4] (Gnome PARTition EDitor).  I installed that with `sudo apt-get install gparted`.  I was able to shrink the partition that had the files I wanted to keep, and create a new partition to put the Ubuntu live image.  `gparted` also lets you set the "boot" flag on a partition (I'm not actually sure if this step was necessary based on what happened later).  When I was attempting to set the boot flag, the "Manage Flags" button was grayed out.  Thanks to a helpful [superuser][5] post, I learned that you have to apply your partition edits before you can mess with flags.
 
 # Booting From the Grub Command line
 
@@ -51,7 +51,11 @@ $ initrd (hd1,gpt1)/casper/initrd.lz
 $ boot
 ```
 
-This booted successfully, and then installation was a breeze. Notably, I did not have to do some USB gymnastics to get a driver for my wireless card since Ubuntu does not have the same ideological barriers against closed source drivers.  It looks like the modules Ubuntu uses are the `brcmsmac` drivers:
+This booted successfully!
+
+# Installation
+
+ Installation was a breeze. Notably, I did not have to do some USB gymnastics to get a driver for my wireless card since Ubuntu does not have the same ideological barriers against closed source drivers.  It looks like the modules Ubuntu uses are the `brcmsmac` drivers:
 
 ```
 $ lsmod | grep -e b43 -e b44 -e brcmsmac -e bcma -e ssb -e wl
