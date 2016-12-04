@@ -244,7 +244,7 @@
         <g fill="#000" font-family="Arial,Helvetica" text-anchor="middle"
            font-size="21.6px">
             <text x="1062" y="79.2">
-                W3
+                W1
             </text>
         </g>
         <path d="M 1062 162 L 1062 90" fill="none" stroke="#000000"
@@ -277,7 +277,7 @@
         <g fill="#000" font-family="Arial,Helvetica" text-anchor="middle"
            font-size="21.6px">
             <text x="702" y="79.2">
-                W1
+                W3
             </text>
         </g>
         <rect x="1240.2" y="70.2" width="3.6" height="3.6" fill="#000000"
