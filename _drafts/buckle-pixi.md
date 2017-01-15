@@ -16,7 +16,7 @@ My goals for this project are:
 
 # Why PixiJS?
 
-I chose [PixiJS][4] pretty arbitrarily.  I actually started down this whole BuckleScript path after playing around a little bit with [Halite.io][2].  That site is an AI programming competition.  I wanted to be able to simulate different scenarios in that game, and I found they wrote their visualization with [PixiJS][4].  I didn't end up doing anything with [halite.io][2] partially because my friend introduced me to [Screeps][3] which I got hooked on.  Still, I liked the visualization they used, and I've been wanting to create some visualizations that are sort of outside the intended audience for things like [d3.js][5] which I've worked with before.
+I chose [PixiJS][4] pretty arbitrarily.  I actually started down this whole BuckleScript path after playing around a little bit with [Halite.io][2].  That site is an AI programming competition.  I wanted to be able to simulate different scenarios in that game, and I found they wrote their visualization with [PixiJS][4].  The idea of extending their visualization with BuckleScript seemed like a fun project. I didn't end up doing anything with [halite.io][2] (partially because my friend introduced me to [Screeps][3] which I got hooked on).  Still, I liked the visualization they used, and I've been wanting to create some more game-like visualizations that are outside the intended use case for [d3.js][5] which I've worked with before.
 
 # Drawing a Circle
 
@@ -68,7 +68,7 @@ function animate() {
 
 # Adding BuckleScript
 
-In the example above, I could download the PixiJS library and stick it a "js" folder.  While something similar may be possible with BuckleScript, the happier path is to use NPM.  Running `npm init` in a new directory prompts you to fill out the fields needed for a barebones `package.json`.  Once that's done, I installed BuckleScript with `npm install --save bs-platform`.  This gave me version `1.4.1`.
+In the example above, I could download the PixiJS library and stick it in a "js" folder.  While something similar may be possible with BuckleScript, the happier path is to use NPM.  Running `npm init` in a new directory prompts you to fill out the fields needed for a barebones `package.json`.  Once that's done, I installed BuckleScript with `npm install --save bs-platform`.  This gave me version `1.4.1`.
 
 Next up is to create a `bsconfig.json`.  Mine looks like this:
 
@@ -113,7 +113,7 @@ I included this JS file in the index.html, I saw the output in the console. Exci
 
 # Calling browser API's
 
-The first thing the demo script I am using does is append a node to the `body`, so the first thing I am going to tackle is interacting with the document API's.  I  based my calling loosely off of the "ReasonML" bindings that I found on GitHub [here][6].  TODO: look up Cheng Lou's role with Reason.  Here is what I came up with to append a simple text node to the document body:
+The first thing the demo script I am using does is append a node to the `body`, so the first thing I am going to tackle is interacting with the document API's.  I  based my calling loosely off of the "ReasonML" bindings that I found on GitHub [here][6].  Here is what I came up with to append a simple text node to the document body:
 
 ```
 type element
@@ -126,16 +126,220 @@ let () =
     appendChild body (createTextNode "hi there!")
 ```
 
-First, I declared an abstract type `element`.  The next line lets me use `body` as an element, and whenever I use it, the resulting JS will use `document.body` to get the value (this what the `[@@bs.val]` piece does.)
+First, I declared an abstract type `element`.  The next line lets me use `body` as an element, and whenever I use it, the resulting JS will use `document.body` to get the value (this what the `[@@bs.val]` language extension does.)
 
-Next is the `appendChild` definition.  This uses the `[@@bs.send]` macro (TODO: are they called macros?).  This means that the first argument is the object, and the next arguments are the arguments to be sent to that object.  In this case, the first `element` has `appendChild` called on it with the second `element` as its argument and returns nothing (aka `unit`).  A more comprehensive description of these attributes can be found on the BuckleScript wiki [here][7].
+Next is the `appendChild` definition.  This uses the `[@@bs.send]` language extension.  This means that the first argument is the object, and the next arguments are the arguments to be sent to that object.  In this case, the first `element` has `appendChild` called on it with the second `element` as its argument and returns nothing (aka `unit`).  A more comprehensive description of these attributes can be found on the BuckleScript wiki [here][7].
 
 The last external definition is for `createTextNode`.  We use `[@@bs.val]` again here.  We could also have created an external declaration for `document` and used `[@@bs.send]` like we did for `appendChild`, but this way seemed simpler since there will only ever be one `document` (i.e. we won't benefit from having the general type for `document` and general functions for it).
 
+# Calling an External library
+
+The next step is making a call to PixiJS. Up to this point, I've had an index.html with a script tag in it's `<head>` importing the library.  This set the global `PIXI` variable which let me make my calls in my `main.js` which I included inside the `<body>`.  (Note: I could stick my script in the `<head>` too, but then I would have to check that the document had loaded before appending children to the `<body>`.)
+
+Eventually, I may want to manage this dependency using a `require` statement, but for now, I'll continue with including the script in `<head>`.  This means I can assume I have a global `PIXI` object at my disposal.
 
 
+ The first piece of code I would like to convert this:
+
+```
+var renderer = PIXI.autoDetectRenderer(800, 600, {antialias: true});
+```
 
 
+I wrote a sub module to help here:
+
+```
+module Renderer = struct                                              
+    class type _t = object
+        method view: element                                          
+    end [@bs]
+    type t = _t Js.t
+
+    type options = < antialias : bool > Js.t
+
+    external autoDetectRenderer :
+        int -> int -> options -> t = "PIXI.autoDetectRenderer" [@@bs.val]
+end
+```
+
+The first class definition sets up the type for the return value for `PIXI.autoDetectRenderer`.  We also add a `view` member since that is what gets appended to the body.  We call it a `method` with 0 arguments in order for it to be a field.  Now we can access the `view` of an instance of `Renderer.t` via the `##` operator. (The normal field access operator in OCaml is `#`, `##` is a language extension from BuckleScript.)
+
+The second part defines a type for the options to pass to our function.  We're only using the `antialias` flag (and to be honest I'm not sure how necessary that is, but I figured it was worthwhile to see how passing options would work.)
+
+Finally, we have our `autoDetectRenderer` function which I wrote as an external declaration calling the global `PIXI` object.  We may have to adapt this if we start including `PixiJS` via imports rather than letting it be set globally.
+
+Now the code to attach the renderer to the page is this:
+
+```
+let () =                
+    let opts = [%bs.obj {antialias = true}] in                        
+    let renderer = Renderer.autoDetectRenderer 800 600 opts in        
+    appendChild body renderer##view
+```
+
+Notably, I use the `[%bs.obj]` extension to create a javascript object.  Opening this shows the blank black canvas.
+
+
+# Drawing a Circle Again
+
+Now that we've got the renderer in place, we can do similar things to get other pieces in place.  Here is what I came up with for the Graphics and Container pieces:
+
+```
+module Graphics = struct
+    class type _t = object
+        method lineStyle: int -> unit
+        method beginFill: int -> float -> unit
+        method drawCircle: float -> float -> float -> unit
+        method endFill: unit -> unit
+        method clear: unit -> unit
+    end [@bs]
+    type t = _t Js.t
+
+    external create : unit -> t = "PIXI.Graphics" [@@bs.new]
+end
+
+
+module Container = struct
+    class type _t = object
+        (* This should probably accept more than Graphics.t *)
+        method addChild : Graphics.t -> unit
+    end [@bs]
+    type t = _t Js.t
+    external create : unit -> t = "PIXI.Container" [@@bs.new]
+end
+```
+
+One new thing here was the `[@bs.new]` extension to call the constructor.  The new draw circle function looks very similar to the plain JS version:
+
+```
+let drawCircle graphics x y r =                                       
+    graphics##lineStyle 0;                                            
+    graphics##beginFill 0xFFFF0B 0.5;
+    graphics##drawCircle x y r;
+    graphics##endFill ()
+```
+
+
+Then our main function looks like this:
+
+```
+let () =
+    let opts = [%bs.obj {antialias = true}] in                        
+    let renderer = Renderer.autoDetectRenderer 800 600 opts in        
+    let stage = Container.create () in                                
+    let graphics = Graphics.create () in                              
+    appendChild body renderer##view;
+    stage##addChild graphics;
+    drawCircle graphics 300. 300. 60.;
+    renderer##render stage
+```
+
+With all this code in place, the circle is drawn on the stage!
+
+
+# Requesting Animation Frame
+
+The last piece is `requestAnimationFrame`.  The new parts about this is that it makes a recursive call and it depends on mutability (for the `t` value).  For the mutability, I used a `ref`, and for the recursive call I used the `rec` keyword both which you can read more about in Real World OCaml ([Ref cells][8], [recursive functions][9])  Here's what I came up with:
+
+```
+external requestAnimationFrame :
+    (unit -> unit) -> unit = "requestAnimationFrame" [@@bs.val]
+external sin : float -> float = "Math.sin" [@@bs.val]
+external cos : float -> float = "Math.cos" [@@bs.val]
+
+let startAnimation graphics renderer stage =
+    let t = ref 0.0 in
+    let centerX = 300. in
+    let centerY = 300. in
+    let bigR = 200. in
+    let littleR = 60. in
+    let deltaT = 0.05 in
+    let rec animate () =
+        let x = (bigR *. (sin !t)) +. centerX in
+        let y = bigR *. (cos !t) +. centerY in
+        graphics##clear ();
+        drawCircle graphics x y littleR;
+        t := !t +. deltaT;
+        renderer##render stage;
+        requestAnimationFrame animate
+    in requestAnimationFrame animate
+```
+
+One piece which caught me up (but would probably be old news to an experienced OCaml-er) is that floating point and integer operators are different.  For integer addition, you use `+`, but for float addition you use `+.`. Similarly, you have to specify floats expliclitly with the trailing decimal point, they won't be inferred.  My first draft, I left this out, so my variables were ints.  The syntax error was pretty verbose because it told me that the type for the `Graphics.t` I was passing in didn't match the expected type.  This was because the actual `Graphics.t` had methods that worked on floats while I was asking for one with methods that used ints.
+
+
+# Stopping Exports
+
+BuckleScript follows OCaml's logic about what is exported in a module.  In the case of this module, it did this by adding these lines to the bottom of the JavaScript output:
+
+```
+exports.Graphics       = Graphics;
+exports.Container      = Container;
+exports.Renderer       = Renderer;
+exports.drawCircle     = drawCircle;
+exports.startAnimation = startAnimation
+```
+
+When I include this file directly in `index.html`, I get an error that `exports` is not defined.  In order to prevent these exports statements from being included, I can add a `.mli` file.  These are OCaml's interface files which define what is available to other modules.  I created a `main.mli` file with just a comment and this got rid of the export statements (when it was totally empty, I was still seeing the export statements).  If I ever want to use this module as a library, I'll need to modify that `.mli` file to include what I actually want to export.
+
+# The final JS output
+
+Here is the final output:
+
+```
+// Generated by BUCKLESCRIPT VERSION 1.4.1 , PLEASE EDIT WITH CARE
+'use strict';
+
+
+function drawCircle(graphics, x, y, r) {
+  graphics.lineStyle(0);
+  graphics.beginFill(16776971, 0.5);
+  graphics.drawCircle(x, y, r);
+  return graphics.endFill();
+}
+
+function startAnimation(graphics, renderer, stage) {
+  var t = [0.0];
+  var animate = function () {
+    var x = 200 * Math.sin(t[0]) + 300;
+    var y = 200 * Math.cos(t[0]) + 300;
+    graphics.clear();
+    drawCircle(graphics, x, y, 60);
+    t[0] += 0.05;
+    renderer.render(stage);
+    requestAnimationFrame(animate);
+    return /* () */0;
+  };
+  requestAnimationFrame(animate);
+  return /* () */0;
+}
+
+var opts = {
+  antialias: /* true */1
+};
+
+var renderer = PIXI.autoDetectRenderer(800, 600, opts);
+
+var stage = new PIXI.Container();
+
+var graphics = new PIXI.Graphics();
+
+document.body.appendChild(renderer.view);
+
+stage.addChild(graphics);
+
+startAnimation(graphics, renderer, stage);
+
+/* opts Not a pure module */
+```
+
+Very readable, and very similar to the original plain JavaScript.  Notably, it does not mention any of the modules I created (Graphics, Container, Renderer).  I don't export them and they were mostly just declarations of functionality in the actual classes (rather than implementations), so they didn't need to be included.
+
+# Conclusion
+
+Overall, the experience of working with BuckleScript has been pretty good.  The documentation isn't exhaustive (for instance, I had hard time figuring out what options are available in `bsconfig.json`), but it gives a lot of useful examples.  There was the additional learning curve of OCaml, for which [Real World OCaml][10] has been indispensable.
+
+Going forward, it will be interesting to see where the ecosystem goes in terms of interoperability.  The `bsb` tool has an experimental feature to output the `.d.ts` type definitions needed for TypeScript.  A really interesting piece would be to parse `.d.ts` files in order to create OCaml with the right `external` declarations.
 
 [1]:{% post_url 2017-01-02-bucklescript-1 %}
 [2]:https://halite.io/
@@ -144,3 +348,6 @@ The last external definition is for `createTextNode`.  We use `[@@bs.val]` again
 [5]:https://d3js.org/
 [6]:https://github.com/chenglou/reason-js/blob/master/src/reasonJs.re
 [7]:https://github.com/bloomberg/bucklescript/wiki/OCaml-call-JS
+[8]:https://realworldocaml.org/v1/en/html/imperative-programming-1.html#ref-cells
+[9]:https://realworldocaml.org/v1/en/html/variables-and-functions.html#recursive-functions
+[10]:https://realworldocaml.org/
