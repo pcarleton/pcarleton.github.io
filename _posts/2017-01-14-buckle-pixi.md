@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Pixi Buckles - Using PixiJS with BuckleScript"
+title: "Buckle Pixi - Using PixiJS with BuckleScript"
 ---
 
 
