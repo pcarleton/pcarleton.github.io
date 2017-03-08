@@ -3,8 +3,6 @@ layout: post
 title: "Morse Code to Emoji: A Brief history of character encodings"
 ---
 
-
-
 # Introduction
 
 I found myself wondering what Unicode symbols looked like at the bit level.  In the ASCII world, a single byte is a single character, so the encoding is relatively straightforward.  However, in the UTF-8 encoding, a single character can span multiple bytes, so how does the program know when the character starts and ends?
@@ -35,6 +33,8 @@ The next character encoding came from Émile Baudot.  Baudot realized that the t
 
 ![Animation of multiplexing][multiplexing-gif]{:height="150px"}
 
+ _Photo credit Tony R. Kuphaldt 2006_{:style="font-size: 10px"}
+
 
 ![Diagram of Baudot keyboard][baudot-keyboard]{:height="120px" style="float: right;margin-left: 7px;margin-top: 7px;"}
 In order for his system to work, each character needed to be transmittable in precisely same time interval.  To achieve this, he developed a 5 bit encoding with a corresponding 5 bit keyboard.  The keyboard had 3 keys for the right hand and 2 keys for the left.  Baudot designed his code in the interests of making it easy for the operator to remember and easy to input into the machine.
@@ -54,7 +54,7 @@ In Murray's system, the operator would press a key corresponding to the letter t
 
 In 1924, the Murray-Baudot code was standardized by the ITU (International Telegraph Union) into ITA-2.
 
-# 1963 - ASCII
+# 1963 - [ASCII][ascii]
 
 #### Why 7 bits?
 With the rise of digital devices, the need for a new encoding arose.  ITA-2 and other encodings at the time had the 26 alphabetic characters, 10 numerals and ranged from 11 to 25 special graphic symbols.  To incorporate all of these plus newly added control characters to support new types of devices, the code needed to support more than the 64 bits allowed by a 6 bit encoding, which led to the decision of 7 bits.  A shift function similar to that in the Baudot code was considered, but the loss in reliability for data transmission was deemed to high.
@@ -73,7 +73,7 @@ The digits 0-9 have 011 as their top 3 bits, but the bottom 4 bits are their bin
 
 ASCII was sufficient for communicating in modern English, but other languages using the Latin alphabet with additional symbols were out of luck.  Computers started shifted towards 8-bit bytes, so often ASCII characters had an unused high bit.  To support these additional symbols, several encodings were developed which used ASCII for 0-127, and a separate encoding for 128-255.  Since this was not enough code positions to handle all the symbols for all the languages, several different encodings were developed (i.e. Latin-1 through Latin-10 and others.)
 
-These separate encodings allowed for many languages to be more correctly represented, however, they disallowed multiple languages from occuring in the same file.  For instance, if you wanted an "Õ" to occur in the same file as a "Ф", you were out of luck.
+These separate encodings allowed for many languages to be more correctly represented, however, they disallowed multiple languages from occurring in the same file.  For instance, if you wanted an "Õ" to occur in the same file as a "Ф", you were out of luck.
 
 In 1991, Joe Becker, Lee Collins, and Mark Davis with the help of some others outlined a "unique, unified, universal encoding".  The idea was to have a single encoding that could handle all of the various symbols so you could have multiple in the same file and you wouldn't have to worry about supporting 10's of different encodings in your application.  They originally devised it to be a 16 bit encoding under the assumption that that would be enough (65,536 code positions).
 
@@ -84,17 +84,17 @@ Several different encodings for unicode were developed.  The goals of the encodi
 
 UTF-16 uses 1 or 2 8-bit bytes.  It sacrifices a range of numbers in order to encode some code points as 2 bytes rather than one.  For the 2 byte characters, it subtracts a number from it to get a 20 bit number, it then splits those 20 bits between 2 bytes and adds a particular number to it.  This means there is a range of values that are reserved for UTF-16.
 
-UTF-8 is a variable-length encoding with 8 bit units.  It was developed in by Ken Thompson and Rob Pike.  For ASCII characters, all the bits are the same.  For a unicode code point, there is first a "header" character followed by "continuation" bytes.  The header character has between 2 and 4 high bits set to 1 followed by a 0.  The number of 1's corresponds to the total length of the code point in bytes.  The continuation byte has a leading "10" in the highest order bits.  The bits other than the ones used for this header/continuation information are used to encode the "code point" number for the character.  I recommend [the table on Wikipedia][utf8-encoding-table] which color codes header, continuation and code point bits.
+UTF-8 is a variable-length encoding with 8 bit units.  It was developed in by Ken Thompson and Rob Pike.  For ASCII characters, all the bits are the same.  For a unicode code point, there is first a "header" character followed by "continuation" bytes.  The header character has between 2 and 4 high bits set to 1 followed by a 0.  The number of 1's corresponds to the total length of the code point in bytes.  The continuation byte has a leading "10" in the highest order bits.  The bits other than the ones used for the header/continuation information are used to encode the "code point" number for the character.  I recommend [the table on Wikipedia][utf8-encoding-table] which color codes header, continuation and code point bits.
 
-There are several nice things about this format.  First, the header information tells you the length of the character, so you are not dependent on reading a subsequent byte to tell you the character is over.  Second, picking up a string of bytes midway through means you will lose a maximum of 1 character (In the worst case, you pick up a continuation byte, and you just discard it until you get a "header" byte or an ASCII byte.)
+There are several nice things about this format.  First, the header information tells you the length of the character, so you are not dependent on reading a subsequent byte to tell you the character is over.  Second, picking up a string of bytes midway through means you will lose a maximum of 1 character (In the worst case, you pick up a continuation byte, and you just discard it until you get the next "header" byte or an ASCII byte.)
 
-Originally, UTF8 characters supported up to 6 bytes, and 2 billion valid code points (Although there are 48 possible bits, only 31 are available for encoding separate code points since the other 16 are used for header/continuation).  This was limited to 4 bytes in order to have compatibility with utf-16.  In addition to limiting to 4 bytes, several code points were invalidated in order to avoid conflicts with UTF-16.
+Originally, UTF8 characters supported up to 6 bytes, and 2 billion valid code points (Although there are 48 possible bits, only 31 are available for encoding separate code points since the other 16 are used for header/continuation).  This was limited to 4 bytes in order to have compatibility with UTF-16.  In addition to limiting to 4 bytes, several code points in the lower ranges were deemed invalid since they would interfere with the [UTF-16 surrogate pairs][utf-16-surrogate].
 
 As of this writing, UTF-8 is used by 88.7% of all websites according to [w3techs.com][utf8-percent].
 
 # Further Reading
 
-* [Best of Interface Age Volume 2: General Purpose Software (PDF)][boi] - This has an article called "Inside ASCII" with some interesting insights into the decisions that went into it.
+* [Best of Interface Age Volume 2: General Purpose Software (PDF)][boi] - This has an article called "Inside ASCII" with some interesting insights into the decisions that went into the ASCII encoding.
 
 * [History of the ITU](http://www.itu.int/en/history/Pages/DiscoverITUsHistory.aspx)
 
@@ -110,11 +110,9 @@ As of this writing, UTF-8 is used by 88.7% of all websites according to [w3techs
 * [UTF-8](https://en.wikipedia.org/wiki/UTF-8)
 
 
-
-
 [morse-photo]:{{site.s3_base}}/morse-to-emoji/Samuel_Morse.jpg
 [morse-lafayette-portrait]:{{site.s3_base}}/morse-to-emoji/morse_lafayette.jpg
-[morse-table]:{{site.s3_base}}/morse-to-emoji/International_Morse_Code-JamesKanjo.PNG
+[morse-table]:https://upload.wikimedia.org/wikipedia/commons/b/b5/International_Morse_Code.svg
 [baudot-photo]:{{site.s3_base}}/morse-to-emoji/Emile_Baudot.jpg
 [multiplexing-gif]:{{site.s3_base}}/morse-to-emoji/multiplexing.gif
 [baudot-keyboard]:{{site.s3_base}}/morse-to-emoji/baudot-keyboard.JPG
@@ -122,5 +120,7 @@ As of this writing, UTF-8 is used by 88.7% of all websites according to [w3techs
 [boi]:https://web.archive.org/web/20160827000956/http://dlx.bookzz.org/genesis/772000/c80a62495acf1e1a5b966de23c1f989a/_as/%5BInterface_Age_Staff%5D_Best_of_Interface_Age%2C_Volum(BookZZ.org).pdf
 
 [ascii-control]:https://en.wikipedia.org/wiki/ASCII#Control_characters
+[ascii]:https://en.wikipedia.org/wiki/ASCII
 [utf8-percent]:https://w3techs.com/technologies/details/en-utf8/all/all
 [utf8-encoding-table]:https://en.wikipedia.org/wiki/UTF-8#Examples
+[utf-16-surrogate]:https://en.wikipedia.org/wiki/UTF-16#U.2B10000_to_U.2B10FFFF
