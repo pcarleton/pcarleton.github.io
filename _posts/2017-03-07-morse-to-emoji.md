@@ -15,9 +15,19 @@ This question led me on a winding trail of history via Wikipedia and other sourc
 
 Our story begins in 1825 with Samuel Morse.  Morse was 33 years old and married to a woman named Lucretia.  Together, they had 3 children, the youngest of whom had just recently been born.  Morse was a renowned painter and was commissioned to paint a portrait of the revolutionary war hero Marquis de Lafayette (age 68 at the time).  Morse went to D.C. to paint the portrait.
 
-![Morse's portrait of Lafayette][morse-lafayette-portrait]{:height="200px" style="float: right;"}
+
+{::options parse_block_html="true" /}
+
+<div style="float: right;">
+
+![Morse's portrait of Lafayette][morse-lafayette-portrait]{:height="300px"}
+
+_Morse's portrait of Lafayette_{:style="font-size: 10px"}
+</div>
 
 In the midst of his painting, he received a letter from his father saying that his wife had been sick, but was recovering.  The next day, he received another letter stating that she had passed suddenly.  By the time he got back to New York, she had already been buried.  Morse was heartbroken and frustrated that his wife was suffering for days without his knowledge.  This set his mind toward improving the speed of communication.
+
+<div style="clear: both"></div>
 
 # 1836 - Morse Code
 
