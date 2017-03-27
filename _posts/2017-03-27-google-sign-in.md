@@ -58,4 +58,4 @@ The code for this is available [here][signin-example].
 
 [gae]:https://cloud.google.com/appengine/docs/standard/python/users/#Python_User_authentication_in_Python
 [gae-app-yaml]:https://cloud.google.com/appengine/docs/standard/go/config/appref#handlers_login
-[signin-example]:https://github.com/pcarleton/google-login-example
+[signin-example]:https://github.com/pcarleton/google-signin-example
