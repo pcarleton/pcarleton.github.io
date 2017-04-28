@@ -1,0 +1,70 @@
+---
+layout: post
+title: "Understanding Authentication and Sessions"
+---
+
+# Motivation
+
+In [my post about using Google Sign-In][signin-post], I walked through some pieces of authenticating using Google as an identity provider.  In the example I used [Flask-Login][flask-login] to manage sessions. Since then, I tried implementing something similar in Go and went down a little bit of a rabbit hole in terms of different ways to work with sessions.  In this post, I'll explain what I've found.
+
+# What is authentication?
+Authentication is the process of verifying I am who I say I am.  To do that, I need to provide some proof, and after providing this proof, a system gives me access to things that are private to me.
+
+A method I have found useful for understanding authentication is to think about building an authentication system from the ground up to see why certain pieces are necessary.
+
+For instance, let’s say I am at a bank trying to get to a safety deposit box.  The bank needs to know what box I want, so I tell them I’m Paul and they bring me Paul’s box.  This is like signing in to a website with just a username.  Anybody who knows my name could come to the bank and say they are Paul and get to my box.  The bank probably does not want to allow that.
+
+The next step would be to say my name and a secret password.  Then the bank would check if my password was correct, and then bring me my box.  This way, people who know my name would also need my secret, so I would be more difficult to impersonate.  However, if someone was standing next to me at the bank and overhead my password, they could again easily impersonate me.  This is similar to someone snooping your wifi traffic and grabbing a password.
+
+To avoid that situation, I could write my password down, put it in a box and hand that to the bank.  Then someone who’s looking on would just see the closed box and would not be able to grab my password and impersonate me.  This is an oversimplification of communicating using HTTPS and SSL.  I won’t get more into that here, but [here's an article about that][ssl-explainer].
+
+All in all, this would be a reasonably secure system.  One piece I left out is how the bank stores password information.  For instance, if they just wrote the passwords in a book, and then somebody got the book, they could get into everybody’s account.
+
+However, let’s say that instead of just accessing a security deposit box, I wanted to get a mortgage or some other more involved transaction at the bank.  If every interaction I had with someone I had to re-write down my password, that would get very tedious.  In the next section, I'll talk about how sessions can help.
+
+# What is a session in a web context?
+
+It was helpful for me to understand what a session is by asking what does a session provide? A session lets some data persist through loading different pages or sending different requests to a server.  This typically involves saving a “cookie” in the client's browser which is then sent with all requests to a particular domain after initially being set.  The cookie let’s me re-visit a site I’ve already been to without signing in again.  When I sign in the first time, the website gives me a piece of data to put in my cookie.  When I visit that site again, my browser sends along the piece of data, the server sees it, verifies it, and then counts me as logged in.  This is convenient in that it doesn’t require me to sign-in on every single page.
+
+## Design Considerations
+
+There are a few things to consider when deciding on a session implementation: 1) how easy is it to forge a session, 2) how easy is it to hijack a session and 3) how easy it is to expire a session’s credentials.
+
+Forging a session means how easily could somebody create a cookie that allows them impersonate me.  For instance, if my cookie was my username, this would be easily forgeable (it would be similar to having a login page with only a username field.).  Someone could just set their cookie to my username and access all my data.
+
+Session hijacking is where someone gets access to my actual cookie (i.e. they didn’t create it) and they use that to impersonate me.  It is unfortunately difficult to protect against.  An important requirement is to have all  connections use HTTPS so an attacker cannot get my cookie from sniffing my packets.  Additionally, setting my cookie to be a “secure” cookie so my browsers knows to only send the cookie over secure connections. Other steps include pairing a session identifier with other information from the client like an IP address and user agent.  Unfortunately, IP addresses and user agents are forge-able. That means this check would make hijacking more difficult but not impossible.  I haven’t dug very deep into session hijacking, so for the rest of this post, I will focus on other pieces.
+
+Expiring a session means that on the server side we can decide to stop accepting some credentials as valid and require a user to sign-in again.  This is helpful if I log in on a public computer or I sell my computer and forget to logout.  I would like to not stay signed in forever, so if someone browsed to that site months down the line, they would not be signed in as me.
+
+## Implementations
+
+Back to implementation, I mentioned that using my username is a bad idea since that is easy to forge.  I could make it less easy to forge by making my cookie my username and my password.  This would be more difficult to forge (and actually not necessary to forge since if someone had my password, they could sign-in as me instead of bothering with creating a cookie).  However, as long as my password is still valid, the session would not expire (i.e. someone could use it to sign-in).  To avoid that, we will need some other technique to set a cookie.
+
+### Session Token
+
+One technique is to assign a random “token” to the user at sign-in and store this on the server.  When the server receives a new request, it checks the token against its database to see that it is valid and see which user it corresponds to.  This makes the token difficult to forge.  It also lets you expire a session by setting a date in the database for when a particular token is valid.
+
+### Signed Messages
+
+Another technique is to “sign” the cookie with a secret that only the server knows.  [HMAC][wiki-hmac] is one such algorithm for signing a message.  It stands for Hash-based method authentication code, and it can verify the data integrity and authentication of the message.  The way it does this is to put the “message” and the “secret” through a one-way cryptographic function to get a value.  The output of this (we’ll call it the signature) is sent along with the message.  If our signature was “ABCD”, then our cookie would be “ABCD.<message>”.  This would get set in the client’s browser and sent along with subsequent requests.  When the server sees this cookie tacked on to a request, it creates the signature again (by passing the message with its secret through one-way function) and checks if the signature matches the one sent with the message.  If it does, it knows that whoever created this cookie was in possession of the secret key which we keep on the server.  This is the authentication part because if someone made up a cookie, they could not recreate the “signature” without being in possession of the secret key.
+
+The data integrity part comes from the hash of the message.  If someone started with a legitimate cookie and then wanted to change users for example, the “signature” would no longer be valid because the hash of the message would be different which would lead to a different signature.
+
+Since the contents of the cookie can be trusted, we can also set an expiration date in the cookie itself.  When the server gets the cookie, it can check whether it is still valid in the timestamp.
+
+## Advantages and Disadvantages
+
+Both of these techniques have advantages and disadvantages.  For instance, the first random token option requires interacting with a database.   The second signed cookie option requires sending more data with each request and also requires selecting a secret which introduces its own challenges of keeping it secret and distributing it to new servers.  Depending on the application one or the other may make more sense.
+
+# Conclusion
+
+That is the basics of what goes into session management.  For Go, I found the [Gorilla sessions package][gorilla-sessions] to be very useful.  I would also highly recommend the ["Authenticating Users"][gcp-auth] example from the Google Cloud Platform if you're looking to do a server-side OAuth flow.  The client side version I used in my [last post][signin-post] was missing a key "validate_token_info" function in the Go client library.  I plan on discussing how to implement that function in Go in a follow up post.
+
+
+
+[ssl-explainer]:http://www.techradar.com/news/software/how-ssl-and-tls-works-1047412
+[wiki-hmac]:https://en.wikipedia.org/wiki/Hash-based_message_authentication_code
+[signin-post]:{% post_url 2017-03-27-google-sign-in %}
+[flask-login]:https://github.com/maxcountryman/flask-login
+[gorilla-sessions]:http://www.gorillatoolkit.org/pkg/sessions
+[gcp-auth]:https://cloud.google.com/go/getting-started/authenticate-users
