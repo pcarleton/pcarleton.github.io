@@ -70,7 +70,43 @@ obsoletes [RFC 1366](https://tools.ietf.org/html/rfc1366) 1992
 
 IANA's role is laid out in [RFC 1591](https://tools.ietf.org/html/rfc1591) where it states some guidelines about selection of managers for TLD's.  It also states that the day-to-day activity is handled by the Internet Registry (IR).
 
+IANA was run by one guy from USC ISI named Jon Postel. Then ICANN formed and took over the responsibility and IANA became a sub-organization of that.
 
+
+Who assigns public IP addresses?
+
+There were Congressional hearings on the new TLD's.
+
+ICANN is a nonprofit organization. NTIA is part of the Department of Commerce and issues the IANA authority, and it signed a contract with ICANN for them to have that responsibility.
+
+In 2014, NTIA said that they are no longer going to be responsible for IANA [press release](https://www.ntia.doc.gov/press-release/2014/ntia-announces-intent-transition-key-internet-domain-name-functions)
+
+First, Network Solutions was the only one from 1993 to 1998.  Cost was $9 for 1 year and $18 for 2 years. [amendmend](https://www.ntia.doc.gov/files/ntia/publications/amendment13.pdf)
+
+Registry vs. Registar.  Verisign bought NSI for $16 Billion, then sold registrar part.
+
+
+ICANN maintains RADAR which is a database Registrar's logon to in order to make domain transfer's etc.
+
+
+So a registry holds the database, and a registrar gets accreditted by ICANN and then can pay a registry to enter its name.  They enter contracts with registries.
+
+What about conflicts?
+
+[Unified Domain-name Dispute Resolution Policy](https://www.icann.org/resources/pages/help/dndr/udrp-en)
+
+
+Did ICANN form to take IANA? Or was that a coincidence once NSI got the contract from ICANN?
+
+What did Verisign do before it acquired NSI?
+
+What did NSI do before it was a registrar?
+
+What did Jon Postel do at USC ISI?
+
+[Postel DNS Root incident](http://songbird.com/pab/mail/0472.html)
+
+[Is ICANN legal?](http://osaka.law.miami.edu/~froomkin/articles/icann-body.htm#H1N5)
 
 
 
