@@ -59,8 +59,6 @@ They provide a web interface and an [email template](https://www.iana.org/domain
 [ARIN](https://www.arin.net/about_us/overview.html)
 [RIR](https://en.wikipedia.org/wiki/Regional_Internet_registry)
 
-Internet Numbers Registry System
-[RFC 7020](https://tools.ietf.org/html/rfc7020) 2013
 obsoletes [RFC 2050](https://tools.ietf.org/html/rfc2050) 1996
 obsoletes [RFC 1466](https://tools.ietf.org/html/rfc1466) 
 obsoletes [RFC 1366](https://tools.ietf.org/html/rfc1366) 1992
@@ -81,7 +79,7 @@ ICANN is a nonprofit organization. NTIA is part of the Department of Commerce an
 
 In 2014, NTIA said that they are no longer going to be responsible for IANA [press release](https://www.ntia.doc.gov/press-release/2014/ntia-announces-intent-transition-key-internet-domain-name-functions)
 
-First, Network Solutions was the only one from 1993 to 1998.  Cost was $9 for 1 year and $18 for 2 years. [amendmend](https://www.ntia.doc.gov/files/ntia/publications/amendment13.pdf)
+First, Network Solutions was the only registrar from 1993 to 1998.  Cost was $9 for 1 year and $18 for 2 years. [amendmend](https://www.ntia.doc.gov/files/ntia/publications/amendment13.pdf)
 
 Registry vs. Registar.  Verisign bought NSI for $16 Billion, then sold registrar part.
 
