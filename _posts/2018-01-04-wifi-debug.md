@@ -37,9 +37,11 @@ Next, I thought maybe there was a lot of WiFi congestion in my area.  Maybe my r
 
 
 
-# Data
+# Experiments
 
-1. Ran speed tests on 3 different sites: [fast.com](http://fast.com) (Netflix's Speed test site), [speedof.me](http://speedof.me) (Javascript based graphs and reports), and [speedtest.net](http://speedtest.net).  
+
+## Speed Tests
+Ran speed tests on 3 different sites: [fast.com](http://fast.com) (Netflix's Speed test site), [speedof.me](http://speedof.me) (Javascript based graphs and reports), and [speedtest.net](http://speedtest.net).  
 
 
 Results:
@@ -49,7 +51,7 @@ Results:
 - speedof.me: 3.15 Mbps
 
 
-1. Raspberry Pi on Ethernet
+## Raspberry Pi on Ethernet
 
 Setup:
 
@@ -60,10 +62,10 @@ Results:
 - wget: 6.9 MB/s => 56 Mb/s
 
 
-1. Laptop to Laptop communication
+## Laptop to Laptop communication
 
 Setup:
-I installed [`iperf`]() on 2 laptops. Laptop 1 is running Linux on a 2011 Macbook Air and was running `iperf -s` (the server).  Laptop 2 is a 2017 Macbook Pro running `iperf -c`.  I started out running with the default parameters which runs a test for 10 seconds, then switched to longer times using `iperf -c -t 60` to run the test for 60 seconds.
+I installed [`iperf`](https://iperf.fr/iperf-download.php) on 2 laptops. Laptop 1 is running Linux on a 2011 Macbook Air and was running `iperf -s` (the server).  Laptop 2 is a 2017 Macbook Pro running `iperf -c`.  I started out running with the default parameters which runs a test for 10 seconds, then switched to longer times using `iperf -c -t 60` to run the test for 60 seconds.
 
 Results:
 
@@ -71,7 +73,7 @@ Results:
 - Average for 60s (3 trials): 5 Mb/s
 
 
-1. Raspberry Pi as AP
+## Raspberry Pi as AP
 
 Setup:
 I put my raspberry pi in AP mode[^2] and had my laptop connect to it directly.
@@ -90,13 +92,13 @@ Hopefully my new hardware does the trick. I plan on writing a follow up post whe
 
 
 
-[^1] The exact command I ran:
+[^1]: The exact command I ran:
 ```
 wget --output-document=/dev/null http://speedtest.wdc01.softlayer.com/downloads/test500.zip
 ```
 NB: `wget` reports speeds in megaBYTES not megaBITS (like most wifi tools).  Multiply by 8 to get a comparable number.
 
-[^2] To setup a Raspberry Pi as an AP, I used `hostapd` and `udhcpd` which you can find instructions for on [raspberrypi.org](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md)
+[^2]: To setup a Raspberry Pi as an AP, I used `hostapd` and `udhcpd` which you can find instructions for on [raspberrypi.org](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md)
 
 
-[^3] I am going with a [USG](https://www.amazon.com/Ubiquiti-Unifi-Security-Gateway-USG/dp/B00LV8YZLK/ref=sr_1_1?ie=UTF8&qid=1515081742&sr=8-1&keywords=ubiquiti+usg+unifi+security+gateway) and a [UniFi AP AC Lite](https://www.amazon.com/dp/B016K4GQVG/ref=sr_ob_1?ie=UTF8&qid=1515081752&sr=8-1).  I went with Ubiquiti based on recommendations from some coworkers and a blog post by [Troy Hunt](https://www.troyhunt.com/ubiquiti-all-the-things-how-i-finally-fixed-my-dodgy-wifi/) that describes similar frustrations as mine.  I debated whether to get an EdgeMax router over the USG after seeing some discussion in Troy's [gist](https://gist.github.com/troyhunt/86ce1de40e58b1eed0961ce6a7a906d5).  I ended up going with the USG since I don't believe I'll benefit from the more advanced configuration opions of the EdgeMax, and I like the idea of all of it working with the UniFi portal.
+[^3]: I am going with a [USG](https://www.amazon.com/Ubiquiti-Unifi-Security-Gateway-USG/dp/B00LV8YZLK/ref=sr_1_1?ie=UTF8&qid=1515081742&sr=8-1&keywords=ubiquiti+usg+unifi+security+gateway) and a [UniFi AP AC Lite](https://www.amazon.com/dp/B016K4GQVG/ref=sr_ob_1?ie=UTF8&qid=1515081752&sr=8-1).  I went with Ubiquiti based on recommendations from some coworkers and a blog post by [Troy Hunt](https://www.troyhunt.com/ubiquiti-all-the-things-how-i-finally-fixed-my-dodgy-wifi/) that describes similar frustrations as mine.  I debated whether to get an EdgeMax router over the USG after seeing some discussion in Troy's [gist](https://gist.github.com/troyhunt/86ce1de40e58b1eed0961ce6a7a906d5).  I ended up going with the USG since I don't believe I'll benefit from the more advanced configuration opions of the EdgeMax, and I like the idea of all of it working with the UniFi portal.
