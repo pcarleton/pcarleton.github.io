@@ -92,8 +92,7 @@ Hopefully my new hardware does the trick. I plan on writing a follow up post whe
 
 
 
-[^1]: The exact command I ran:
-`wget --output-document=/dev/null http://speedtest.wdc01.softlayer.com/downloads/test500.zip` NB: `wget` reports speeds in megaBYTES not megaBITS (like most wifi tools).  Multiply by 8 to get a comparable number.
+[^1]: The exact command I ran: `wget --output-document=/dev/null http://speedtest.wdc01.softlayer.com/downloads/test500.zip` NB: `wget` reports speeds in megaBYTES not megaBITS (like most wifi tools).  Multiply by 8 to get a comparable number.
 
 [^2]: To setup a Raspberry Pi as an AP, I used `hostapd` and `udhcpd` which you can find instructions for on [raspberrypi.org](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md)
 
