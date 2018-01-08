@@ -24,9 +24,9 @@ Now that we know the goal of DNS, I want to demonstrate how DNS works by craftin
 
 ## Root Domain
 
-In order to figure out what IP address is serving "pcarleton.com.", I can work my way down the hierachy.  There are servers at each level of the hierarchy that can tell me where to find information for the level below. The domain name "pcarleton.com" becomes `["", "com", "pcarletion"]` in the hierarchy where the empty string is the implied "root" domain[^4].
+In order to figure out what IP address is serving "pcarleton.com.", I can work my way down the hierachy.  There are servers at each level of the hierarchy that can tell me where to find information for the level below. The domain name "pcarleton.com" becomes `["", "com", "pcarleton"]` in the hierarchy where the empty string is the implied "root" domain[^3].
 
-A name server at the root level can tell me about what nameservers are responsible for each Top Level Domain (TLD) like ".com", ".net" etc.  In order to query a root server, I need to know one of its IP addresses.  I can pick one from the [IANA website](https://www.iana.org/domains/root/servers), so I'll pick `a.root-servers.net` with IP address `198.41.0.4`[^5]
+A name server at the root level can tell me about what nameservers are responsible for each Top Level Domain (TLD) like ".com", ".net" etc.  In order to query a root server, I need to know one of its IP addresses.  I can pick one from the [IANA website](https://www.iana.org/domains/root/servers), so I'll pick `a.root-servers.net` with IP address `198.41.0.4`[^4]
 
 I can then query this root server for what name servers are responsible for `pcarleton.com` via `dig -t ns pcarleton.com @198.41.0.4`.  This gives me a list of servers which are responsible for the `.com` TLD.
 
@@ -36,7 +36,7 @@ The root server gave a list of `.com` nameservers (and IP addresses) that look l
 
 ## Namecheap DNS servers
 
-This query reveals that `dns1.registrar-servers.net` has information for `pcarleton.com` (and has IP `216.87.155.33`).  This name server is the one run by Namecheap which is where I registered `pcarleton.com`.  If we query this one with `dig pcarleton.com @216.87.155.33`, we get the IP address of this site which we can then use.
+This query reveals that `dns1.registrar-servers.com` has information for `pcarleton.com` (and has IP `216.87.155.33`).  This name server is the one run by Namecheap which is where I registered `pcarleton.com`[^5].  If we query this one with `dig pcarleton.com @216.87.155.33`, we get the IP address of this site which we can then use.
 
 ##  Making Changes
 
@@ -55,7 +55,7 @@ Changes to the final DNS servers mapping of domain name to IP address can happen
 
 # Reality Check
 
-This example showed how some of the pieces of the DNS system work, but it is not typically how a DNS request goes.  In reality, the client usually makes a request to a DNS server[^5] which has a lot of information cached (like the .com TLD servers) and will make requests to the appropriate servers rather than telling the client which nameservers to look at[^6].
+This example showed how some of the pieces of the DNS system work, but it is not typically how a DNS request goes.  In reality, the client usually makes a request to a DNS server[^6] which has a lot of information cached (like the .com TLD servers) and will make requests to the appropriate servers rather than telling the client which nameservers to look at[^7].
 
 
 # Further Information
@@ -86,12 +86,14 @@ Here's a list of resources to look for further information about DNS:
 
 [^2]: It is not difficult to imagine how a bad actor could cause trouble with this too. If they were to compromise DNS information, they could cause clients to send information to a location where they can intercept it.  For this post, I won't get into that, and I will pretend like everybody on the internet are behaving nicely.
 
-[^3]: "pcarleton.com" is implicitly re-written as "pcarleton.com." where the root domain is the empty string at the end.
+[^3]: pcarleton.com is implicitly re-written as "pcarleton.com." (note the trailing period) where the root domain is the empty string at the end.
 
 [^4]: Ordinary websites do not load "iana.org" in order to figure out root servers.  These 13 name servers are like internet constants in that their IP addresses never change.  Domain name servers usually have these IP addreses in a file somewhere.
 
-[^5]: One such server is [Google Public DNS](https://en.wikipedia.org/wiki/Google_Public_DNS) which resides at IP address `8.8.8.8`.  
+[^5]: I verified this was Namecheap's by going to [whois.com](https://www.whois.com/whois/registrar-servers.com).  This info can also be obtaind with the `whois` CLI with `whois dns1.registrar-servers.com --host whois.enom.com` (I got the `whois.enom.com` part from first issuing the command without the `--host` argument).  Enom must be the registrar that Namecheap used to register its domain with. That leads me to wonder if there are any circular registrar dependencies, but is looks like Enom used itself to register "enom.com".
+
+[^6]: One such server is [Google Public DNS](https://en.wikipedia.org/wiki/Google_Public_DNS) which resides at IP address `8.8.8.8`.  
 
 
-[^6]: This is assuming that the request is "recursive".  A recursive request asks that the server make requests to other DNS servers if it doesn't have the answer.  An "iterative" request by contrast asks that the server tell the client what server will have the answer if it does not have the answer.  A DNS server gets to decide whether it supports "recursive" requests.
+[^7]: This is assuming that the request is "recursive".  A recursive request asks that the server make requests to other DNS servers if it doesn't have the answer.  An "iterative" request by contrast asks that the server tell the client what server will have the answer if it does not have the answer.  A DNS server gets to decide whether it supports "recursive" requests.
 
