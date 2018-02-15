@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Where do IP addresses come from?"
+title: "Meandering History of DNS Authority"
 ---
 
 As a follow up to my DNS post, I started trying to answer "Who's in charge of all this?".
 
 Basically, I wanted to know what keeps me from claiming a different domain name or for that matter for claiming a different IP address.
+
+I went down a rabbit hole of RFC's and never quite pulled out the answer to my question, but I wanted to post what I did find out since it's been languishing in my drafts for too long.
 
 
 ## Summary
@@ -25,7 +27,7 @@ In 1982, Feinler updates the HOSTS.TXT format to use IP addresses and to specify
 
 First computers linked
 
-Engelbart volunteers SRI as NIC since he has NLS system which could help manage it.
+Engelbart volunteers Stanford Research Institute (SRI) to be the Network Information Center (NIC) since he has NLS (oN-Line System) which could help manage it.
 
 
 
@@ -137,10 +139,10 @@ NIC took over maintaining assigned numbers and become Arpanet/DDN's naming auhto
 ### 1991 
 NIC contract awarded to Network Solutions Inc (NSI).
 
-###1993
+### 1993
 NSI adds root server
 
-###1994
+### 1994
 
 RFC 1591 (Postel):
 internic.net - registers second level domains under the TLD's (com, edu, org, gov, net)
