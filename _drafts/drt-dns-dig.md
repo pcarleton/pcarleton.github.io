@@ -1,117 +1,130 @@
 ---
 layout: post
-title: "Dumb Rusty Toolbox: Dig (DNS Client)"
+title: "Dumb dig clone in Rust"
 ---
 
 
-# Introduction
+# Why write a DNS client
 
-I have started a project that I am calling the Dumb Rusty Toolbox (drt for short) where I implement very dumbed-down versions of common command line utilities.
+When I started digging in to DNS, I thought it would be interesting to try implementing a very simple DNS client similar to `dig`, but using Rust. My goal was to better understand DNS at the protocol level.  I wanted to know what bytes were being sent and received to drive the system.
 
-In this post, I'm going to describe ddig (dumb dig) which is a very rudimentary DNS client written in Rust.
+The final result is in [this repo][dns_repo]).  In the rest of the post, I'll detail what I found out along the way.
 
+# The Protocol
 
-# Goals
-
-Answer these questions:
-
-* What is the purpose of DNS?
-* How does DNS work at a high level?
-* How does DNS work at the protocol level?
+The DNS protocol is detailed in [Domain Names - Implementation and Specification RFC1035](https://www.ietf.org/rfc/rfc1035.txt). Section "4.1 MESSAGES - Format" details the bytes of the protocol.  Here are the ascii diagrams I found useful:
 
 
-# What is the purpose of DNS?
+### Message
+```
 
-The best source for this question is the [Domain Names - Implementation and Specification RFC1035](https://www.ietf.org/rfc/rfc1035.txt).  In the introduction, it says:
+    +---------------------+
+    |        Header       |
+    +---------------------+
+    |       Question      | the question for the name server
+    +---------------------+
+    |        Answer       | RRs answering the question
+    +---------------------+
+    |      Authority      | RRs pointing toward an authority
+    +---------------------+
+    |      Additional     | RRs holding additional information
+    +---------------------+
+```
 
-> The goal of domain names is to provide a mechanism for naming resources
-in such a way that the names are usable in different hosts, networks,
-protocol families, internets, and administrative organizations.
+### Header
 
-> From the user's point of view, domain names are useful as arguments to a
-local agent, called a resolver, which retrieves information associated
-with the domain name.  Thus a user might ask for the host address or
-mail information associated with a particular domain name.  To enable
-the user to request a particular type of information, an appropriate
-query type is passed to the resolver with the domain name.  To the user,
-the domain tree is a single information space; the resolver is
-responsible for hiding the distribution of data among name servers from
-the user.
+```
 
-Domain names are supposed to be a convenient, general purpose way to refer to resources.  Convenient in this case most likely means relative to referring things to an actual IP address (or other identifier).  If a user had to remember the IP address for "Google" for instance, that would not be very convenient.
-
-
-# What are the big components of DNS?
-
-# How does authority work?
-
-As the RFC states, there is a "local agent resolver".  This resolver communicates to a nameserver to retrieve information associated with a domain name.  The nameserver might be authoritative for a particular domain name, it might have cached information from another server that is authoritative, or it might have the address of a nameserver that has the information.
-
-An interesting question here is how does a nameserver become authoritative.  For example, if I booted up a server and started serving DNS queries saying that I am the authority for "\*.paul", how would I let other name servers know I'm authoritative on some domain? How does the system prevent another person from claiming they are authoritative for that domain?
-
-I tried to get at this question by querying DNS for the authority for the root domain (i.e. ".", more on this later).
-
-This query looks like `dig -t ns "." @8.8.8.8` (that's type NameServer, domain name "." and 8.8.8.8 is Google's DNS servers) and returns a list of `{a-m}.gtld-servers.net` (13 servers in total). If you go to [IANA's website](https://www.iana.org/domains/root/servers), they list who owns each of those top level name servers.  (IANA is an affiliate if ICANN, more on that later).  They also list who is the TLD manager for every TLD in their [root database](https://www.iana.org/domains/root/db).
-
-They provide a web interface and an [email template](https://www.iana.org/domains/root/tld-change-template.txt) for making changes to root name servers (for example, if you want a new IP address to be authoritative for a TLD).
-
-
-[ARIN](https://www.arin.net/about_us/overview.html)
-[RIR](https://en.wikipedia.org/wiki/Regional_Internet_registry)
-
-obsoletes [RFC 2050](https://tools.ietf.org/html/rfc2050) 1996
-obsoletes [RFC 1466](https://tools.ietf.org/html/rfc1466) 
-obsoletes [RFC 1366](https://tools.ietf.org/html/rfc1366) 1992
+                                    1  1  1  1  1  1
+      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                      ID                       |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |QR|   Opcode  |AA|TC|RD|RA|   Z    |   RCODE   |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                    QDCOUNT                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                    ANCOUNT                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                    NSCOUNT                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                    ARCOUNT                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+```
 
 
-[List of LIR's in US](https://www.ripe.net/membership/indices/US.html)
+### Question Section
 
-IANA's role is laid out in [RFC 1591](https://tools.ietf.org/html/rfc1591) where it states some guidelines about selection of managers for TLD's.  It also states that the day-to-day activity is handled by the Internet Registry (IR).
-
-IANA was run by one guy from USC ISI named Jon Postel. Then ICANN formed and took over the responsibility and IANA became a sub-organization of that.
-
-
-Who assigns public IP addresses?
-
-There were Congressional hearings on the new TLD's.
-
-ICANN is a nonprofit organization. NTIA is part of the Department of Commerce and issues the IANA authority, and it signed a contract with ICANN for them to have that responsibility.
-
-In 2014, NTIA said that they are no longer going to be responsible for IANA [press release](https://www.ntia.doc.gov/press-release/2014/ntia-announces-intent-transition-key-internet-domain-name-functions)
-
-First, Network Solutions was the only registrar from 1993 to 1998.  Cost was $9 for 1 year and $18 for 2 years. [amendmend](https://www.ntia.doc.gov/files/ntia/publications/amendment13.pdf)
-
-Registry vs. Registar.  Verisign bought NSI for $16 Billion, then sold registrar part.
-
-
-ICANN maintains RADAR which is a database Registrar's logon to in order to make domain transfer's etc.
-
-
-So a registry holds the database, and a registrar gets accreditted by ICANN and then can pay a registry to enter its name.  They enter contracts with registries.
-
-What about conflicts?
-
-[Unified Domain-name Dispute Resolution Policy](https://www.icann.org/resources/pages/help/dndr/udrp-en)
-
-
-Did ICANN form to take IANA? Or was that a coincidence once NSI got the contract from ICANN?
-
-What did Verisign do before it acquired NSI?
-
-What did NSI do before it was a registrar?
-
-What did Jon Postel do at USC ISI?
-
-[Postel DNS Root incident](http://songbird.com/pab/mail/0472.html)
-
-[Is ICANN legal?](http://osaka.law.miami.edu/~froomkin/articles/icann-body.htm#H1N5)
+```
+                                    1  1  1  1  1  1
+      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                                               |
+    /                     QNAME                     /
+    /                                               /
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                     QTYPE                     |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                     QCLASS                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+```
 
 
 
 
+### Resource Record (answer)
 
-TODO: Explain IANA and ICANN
-TODO: Introduce the hierachy of domain names and local authority.
-TODO: Answer the "." question
+```
+                                    1  1  1  1  1  1
+      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                                               |
+    /                                               /
+    /                      NAME                     /
+    |                                               |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                      TYPE                     |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                     CLASS                     |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                      TTL                      |
+    |                                               |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                   RDLENGTH                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
+    /                     RDATA                     /
+    /                                               /
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+```
 
-The first question I wanted to answer is what is 
+# Implementation
+
+I started out by "hand" building a DNS query for google.com with hard-coded values to ensure my tool was working.  Once I had this working, I started taking input from the command line.
+
+I am relatively new to Rust, so I was initially trying to put everying on the stack and have nothign on the heap.  While a nice idea in theory, accepting input from the command line, or parsing dynamically sized elements from a server response make this pretty impractical.  I considered having a really large array and saying anything above that size wasn't supported, but ergonomically this didn't make the code any easier to work with.
+
+Around this time, I came across [TRust DNS](https://github.com/bluejekyll/trust-dns), "A Rust based DNS client and server, built to be safe and secure from the ground up."  I took some inspiration from the message parsing code there, specically the `bindecoder` idea.
+
+The end result was a client that could make a very simple DNS query and spit back the response.
+
+# Weird and Interesting Things I came across
+
+* Compression.  The protocol uses a bespoke method of compression where it will refer to resource names that have previously been seen.  It starts with `11` in the leading bits which distinguishes it from an ordinary label because an ordinary label starts with a length byte, and `11` as the leading bytes would make the label too long (they're limited to 63 bytes).
+
+* Bash has a special builtin tool for opening UDP and TCP sockets -- I used this to sanity check my tool very early on (see `hello_udp.sh` in [the repo][dns_repo]).  See [this post](http://xmodulo.com/tcp-udp-socket-bash-shell.html) for more details on how it works.  (Notably, these builtins are not present in Zsh which threw me off).
+
+* [Unified Domain-name Dispute Resolution Policy](https://www.icann.org/resources/pages/help/dndr/udrp-en)
+* [Postel DNS Root incident](http://songbird.com/pab/mail/0472.html)
+* [Is ICANN legal?](http://osaka.law.miami.edu/~froomkin/articles/icann-body.htm#H1N5)
+* [TLD Change email template](https://www.iana.org/domains/root/tld-change-template.txt)
+
+
+# Unanswered Questions and future work
+
+* Who assigns new public IP addresses? And who maintains the existing mappings?
+* Is there a super nice CLI library like Cobra Commander for Go in Rust?
+* Recently, I wanted to know which process was issuing a DNS query against a DNS host I needed to shut-down, but I couldn't seem to do it.  It would be nice if there were a tool to trace particular traffic to an individual process.
+* Writing this super simple version of a common command line tool taught me a lot about how the system works on a lower level, so I'd like to try it with some other ones.
+
+
+[dns_repo]: https://github.com/pcarleton/dumb-dig
