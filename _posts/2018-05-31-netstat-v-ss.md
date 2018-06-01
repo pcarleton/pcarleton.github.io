@@ -5,7 +5,7 @@ title: "TIL: The difference between netstat and ss"
 
 ### Motivation
 
-In this post, I'm going to go over two tools for inspecting the state of sockets and  why people recommend `ss` instead of `netstat`for inspecting socket states.   This is not going to be a 12 ways to inspect socket states article, there are lots of those.
+In this post, I'm going to go over two tools for inspecting the socket states (`netstat` and `ss`), and why to choose one over the other (spoiler: you can really choose either).   This is not going to be a 12 ways to inspect socket states article, there are lots of those.
 
 
 ### What is a socket?
@@ -31,8 +31,7 @@ These questions pertain to sockets that are listening on a host, but there are a
 
 ### How do I inspect the state of sockets on my machine?
 
-The two ways I'll talk about doing this are through `netstat` and `ss`.  Both are command line utilities that are installed on almost all Linux machines.   Before I get into why I would use one or the other, let's look into where they get their information.
-
+The two tools I'll cover are the command line tools `netstat` and `ss`.  I'll start with where they get their information.
 
 
 #### Procfs
@@ -52,19 +51,19 @@ The other source of information is called the `netlink` protocol.  In this case 
 
 ### Netstat vs. ss
 
-Now that we understand the sources of information, why would we prefer one tool over the other?  `netstat` gets its information from `/proc/net` directly.  It parses the file and prints out information based on it.
+`netstat` gets its information from `/proc/net` directly.  It parses the file and prints out information based on it.
 
-`ss` on the other hand was written more recently to use the `netlink` API (it will fall back to `proc/net` if netlink is unavailable).  The information is essentially the same from what I've seen, but here are some arguments for why to use `ss`
+`ss` was written more recently to use the `netlink` API (it will fall back to `proc/net` if netlink is unavailable).  The information in both systems is essentially the same (from what I've seen), but here are some arguments for why to use `ss`
 
-* Supposedly it's faster (I just read that a lot, I don't find `netstat` to be that slow to be honest)
+* It's faster (I just read that a lot, I don't find `netstat` to be noticeably slower)
 * Netlink exposes more TCP states (again I mostly look for `LISTEN` so that's not a huge selling point)
-* It has better default argument behavior
+* It has better default argument
 
-None of these are a huge homerun, which is why I expect a lot of people still use `netstat`.  It's also likely that `netstat` is installed more places. For instance on my macbook, it has `netstat` but not `ss`.
+None of these are a huge homerun, which is why I expect a lot of people still use `netstat`.  It's also likely that `netstat` is installed more places. For instance my Macbook has `netstat` but not `ss`.
 
-The last one is a little more compelling for me personally.  `netstat` by default will try to resolve IP addresses which really slows it down and also opens a bunch of new UDP sockets, which might clutter the picture if you're investigating something.  `netstat -n` stops this behavior, but `ss` has that on by default.
+The default arguments is a little more compelling.  `netstat` by default will try to resolve IP addresses through DNS which really slows it down. It also opens a bunch of new UDP sockets, which might clutter the picture if you're investigating something.  `netstat -n` stops this behavior, but `ss` has that on by default (you can use `ss -r` if you do want the resolution).
 
-Another reason I prefer `ss` is that the code is much nicer to read!
+One other nice thing about `ss` is that its source code is much nicer to read!
 
 ### Open Questions
 
